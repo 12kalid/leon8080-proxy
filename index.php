@@ -1,25 +1,17 @@
 <?php
-header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/vnd.apple.mpegurl");
-
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
 
 $canales = [
     "sicardi" => "https://vivo.solumedia.com:19360/sicarditv/sicarditv.m3u8"
 ];
 
-if (!array_key_exists($canal, $canales)) {
-    die("#EXTM3U\n#EXTINF:-1,Canal No Encontrado en leon8080");
+if (array_key_exists($canal, $canales)) {
+    $url_final = $canales[$canal];
+    // Esta instrucción le dice a la TV que salte el bloqueo de origen
+    header("Location: $url_final");
+    exit;
+} else {
+    header("Content-Type: text/plain");
+    echo "#EXTM3U\n#EXTINF:-1,Canal No Encontrado";
 }
-
-$url_final = $canales[$canal];
-
-$opciones = [
-    "http" => [
-        "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36\r\n"
-    ]
-];
-
-$contexto = stream_context_create($opciones);
-echo @file_get_contents($url_final, false, $contexto);
 ?>
