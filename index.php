@@ -1,8 +1,7 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-// Engañamos a la Samsung diciéndole que es un flujo de video puro
-header("Content-Type: video/mp2t");
-header("Content-Disposition: inline; filename='video.ts'");
+// Definimos que el contenido es una lista de reproducción de video (M3U8)
+header("Content-Type: application/vnd.apple.mpegurl");
 
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
 
@@ -12,15 +11,13 @@ $canales = [
 ];
 
 if (array_key_exists($canal, $canales)) {
-    $url = $canales[$canal];
-    $opts = [
-        "http" => [
-            "method" => "GET",
-            "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36\r\n"
-        ]
-    ];
-    $context = stream_context_create($opts);
-    // Leemos y enviamos los datos
-    readfile($url, false, $context);
+    $url_final = $canales[$canal];
+    
+    // Construimos una estructura que la Smart TV Samsung entiende perfectamente
+    echo "#EXTM3U\n";
+    echo "#EXT-X-VERSION:3\n";
+    echo "#EXT-X-STREAM-INF:BANDWIDTH=1280000,RESOLUTION=1280x720\n";
+    echo $url_final;
+    exit;
 }
 ?>
