@@ -1,7 +1,6 @@
 <?php
-// Permitir conexiones externas
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: video/MP2T");
+header("Content-Type: video/mp2t");
 
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
 
@@ -13,20 +12,22 @@ $canales = [
 if (array_key_exists($canal, $canales)) {
     $url = $canales[$canal];
     
-    $opts = [
+    $opciones = [
         "http" => [
             "method" => "GET",
             "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36\r\n"
         ]
     ];
 
-    $context = stream_context_create($opts);
-    // Leemos el flujo original y lo transmitimos
-    $fp = fopen($url, 'r', false, $context);
+    $contexto = stream_context_create($opciones);
     
-    if ($fp) {
-        fpassthru($fp);
-        fclose($fp);
+    // Abrimos la conexión al canal
+    $stream = fopen($url, 'r', false, $contexto);
+    
+    if ($stream) {
+        // Enviamos el video directamente a la TV
+        fpassthru($stream);
+        fclose($stream);
     }
 }
 ?>
