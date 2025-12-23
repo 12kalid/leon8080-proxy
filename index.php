@@ -1,6 +1,8 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: application/vnd.apple.mpegurl");
+// Engañamos a la Samsung diciéndole que es un flujo de video puro
+header("Content-Type: video/mp2t");
+header("Content-Disposition: inline; filename='video.ts'");
 
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
 
@@ -10,12 +12,15 @@ $canales = [
 ];
 
 if (array_key_exists($canal, $canales)) {
-    $url_final = $canales[$canal];
-    
-    // En lugar de procesar el video, creamos una estructura M3U8 "limpia"
-    // Esto ayuda a que la Samsung entienda que es un streaming estándar
-    echo "#EXTM3U\n";
-    echo "#EXT-X-STREAM-INF:BANDWIDTH=1280000\n";
-    echo $url_final;
+    $url = $canales[$canal];
+    $opts = [
+        "http" => [
+            "method" => "GET",
+            "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36\r\n"
+        ]
+    ];
+    $context = stream_context_create($opts);
+    // Leemos y enviamos los datos
+    readfile($url, false, $context);
 }
 ?>
