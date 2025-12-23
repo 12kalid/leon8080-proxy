@@ -1,6 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
-header("Content-Type: video/mp2t");
+header("Content-Type: application/vnd.apple.mpegurl");
 
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
 
@@ -10,24 +10,12 @@ $canales = [
 ];
 
 if (array_key_exists($canal, $canales)) {
-    $url = $canales[$canal];
+    $url_final = $canales[$canal];
     
-    $opciones = [
-        "http" => [
-            "method" => "GET",
-            "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36\r\n"
-        ]
-    ];
-
-    $contexto = stream_context_create($opciones);
-    
-    // Abrimos la conexión al canal
-    $stream = fopen($url, 'r', false, $contexto);
-    
-    if ($stream) {
-        // Enviamos el video directamente a la TV
-        fpassthru($stream);
-        fclose($stream);
-    }
+    // En lugar de procesar el video, creamos una estructura M3U8 "limpia"
+    // Esto ayuda a que la Samsung entienda que es un streaming estándar
+    echo "#EXTM3U\n";
+    echo "#EXT-X-STREAM-INF:BANDWIDTH=1280000\n";
+    echo $url_final;
 }
 ?>
