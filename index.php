@@ -1,7 +1,6 @@
 <?php
+// Permitir que cualquier dispositivo se conecte
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET");
-header("Content-Type: application/vnd.apple.mpegurl");
 
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
 
@@ -11,17 +10,10 @@ $canales = [
 ];
 
 if (array_key_exists($canal, $canales)) {
-    $url = $canales[$canal];
-    
-    // Generamos una lista M3U8 de un solo nivel (más fácil para la TV)
-    echo "#EXTM3U\n";
-    echo "#EXT-X-VERSION:3\n";
-    echo "#EXT-X-ALLOW-CACHE:NO\n";
-    echo "#EXT-X-TARGETDURATION:10\n";
-    echo "#EXT-X-MEDIA-SEQUENCE:0\n";
-    echo "#EXTINF:10.0,\n";
-    echo $url . "\n";
-    echo "#EXT-X-ENDLIST";
+    // Usamos una redirección 301 (Permanente), que es la que mejor procesan las Samsung
+    header("Location: " . $canales[$canal], true, 301);
     exit;
+} else {
+    echo "Canal no encontrado";
 }
 ?>
