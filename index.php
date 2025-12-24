@@ -1,5 +1,6 @@
 <?php
 header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET");
 header("Content-Type: application/vnd.apple.mpegurl");
 
 $canal = isset($_GET['canal']) ? $_GET['canal'] : '';
@@ -10,9 +11,17 @@ $canales = [
 ];
 
 if (array_key_exists($canal, $canales)) {
-    // Redireccionamos usando el código 302 (Redirección Temporal)
-    // Esto es lo que usan los servicios profesionales para Smart TV
-    header("Location: " . $canales[$canal], true, 302);
+    $url = $canales[$canal];
+    
+    // Generamos una lista M3U8 de un solo nivel (más fácil para la TV)
+    echo "#EXTM3U\n";
+    echo "#EXT-X-VERSION:3\n";
+    echo "#EXT-X-ALLOW-CACHE:NO\n";
+    echo "#EXT-X-TARGETDURATION:10\n";
+    echo "#EXT-X-MEDIA-SEQUENCE:0\n";
+    echo "#EXTINF:10.0,\n";
+    echo $url . "\n";
+    echo "#EXT-X-ENDLIST";
     exit;
 }
 ?>
